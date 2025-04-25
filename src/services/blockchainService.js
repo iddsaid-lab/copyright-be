@@ -18,30 +18,10 @@ export async function generateWallet() {
   return { address: wallet.address, privateKey: wallet.privateKey };
 }
 
-// AudioCopyright contract ABI (truncated for brevity, use full ABI in production)
-const copyrightAbi = [
-  {
-    "inputs": [
-      { "internalType": "address", "name": "artist", "type": "address" },
-      { "internalType": "string", "name": "audioHash", "type": "string" },
-      { "internalType": "uint256", "name": "expiry", "type": "uint256" },
-      { "internalType": "uint256", "name": "registeredAt", "type": "uint256" },
-      { "internalType": "address[]", "name": "officials", "type": "address[]" }
-    ],
-    "name": "registerCopyright",
-    "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [ { "internalType": "string", "name": "audioHash", "type": "string" } ],
-    "name": "getCopyrightId",
-    "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-  // ...add other ABI entries as needed
-];
+// Professional: Import ABI from local JSON artifact for maintainability
+import copyrightArtifact from '../abi/AudioCopyright.json' assert { type: "json" };
+const copyrightAbi = copyrightArtifact.abi;
+
 
 // Register copyright on blockchain (real smart contract interaction)
 export async function registerCopyrightOnChain({ artist, audioHash, expiryDate, registeredAt, officials = [] }) {
@@ -49,6 +29,14 @@ export async function registerCopyrightOnChain({ artist, audioHash, expiryDate, 
   const tx = await contract.registerCopyright(artist, audioHash, expiryDate, registeredAt, officials);
   await tx.wait();
   return { txHash: tx.hash, status: 'success' };
+}
+
+// Fetch copyright info by audio hash from blockchain
+export async function getCopyrightByHash(audioHash) {
+  const contract = new ethers.Contract(process.env.COPYRIGHT_CONTRACT_ADDRESS, copyrightAbi, getProvider());
+  const copyrightId = await contract.getCopyrightId(audioHash);
+  const copyright = await contract.getCopyright(copyrightId);
+  return copyright;
 }
 
 // Register license on blockchain (stub for smart contract interaction)
@@ -65,7 +53,7 @@ export async function registerLicenseOnChain({ licenseId, audioId, owner, reques
 export async function isHashRegisteredOnBlockchain(audioHash) {
   const contract = new ethers.Contract(process.env.COPYRIGHT_CONTRACT_ADDRESS, copyrightAbi, getProvider());
   const copyrightId = await contract.getCopyrightId(audioHash);
-  return copyrightId && copyrightId.toString() !== "0";
+  return copyrightId.toString() !== "0";
 }
 
 // Utility: verify a copyright/license on chain (stub)

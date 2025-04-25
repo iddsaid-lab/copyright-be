@@ -11,6 +11,7 @@ import copyrightRequestRoutes from './api/copyrightRequests/index.js';
 import paymentRoutes from './api/payments/index.js';
 import licensingRoutes from './api/licensing/index.js';
 import adminRoutes from './api/admin/index.js';
+import blockchainRoutes from './api/blockchain/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 // Load env vars
@@ -27,6 +28,13 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from /uploads/audios
+// Allow CORS for static audio files
+app.use('/uploads/audios', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:8080'); // Set to '*' to allow all, or restrict as needed
+  res.header('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  next();
+});
 app.use('/uploads/audios', express.static(path.join(__dirname, '../uploads/audios')));
 app.use(morgan('dev'));
 
@@ -39,6 +47,7 @@ app.use('/api/copyright-requests', copyrightRequestRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/licensing', licensingRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/blockchain', blockchainRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
