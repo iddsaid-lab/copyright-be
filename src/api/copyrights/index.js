@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate, authorizeRoles } from '../../middleware/auth.js';
-import { submitCopyrightRequest, getMyCopyrightRequests, getAllCopyrightRequests, processCopyrightRequest, renewCopyrightRequest } from './routes.js';
+import { submitCopyrightRequest, getMyCopyrightRequests, getAllCopyrightRequests, processCopyrightRequest, renewCopyrightRequest,escalateCopyrightRequest } from './routes.js';
 
 const router = express.Router();
 
@@ -16,6 +16,7 @@ router.get('/all', authenticate, authorizeRoles('manager', 'officer', 'cashier')
 import { getAllCopyrightsWithAudio } from './routes.js';
 router.get('/with-audio', authenticate, authorizeRoles('manager', 'officer', 'cashier'), getAllCopyrightsWithAudio);
 router.post('/process/:id', authenticate, authorizeRoles('manager', 'officer', 'cashier'), processCopyrightRequest);
+router.post('/escalate/:id', authenticate, authorizeRoles('officer'), escalateCopyrightRequest);
 
 // Renewal
 router.post('/renew/:id', authenticate, authorizeRoles('artist'), renewCopyrightRequest);

@@ -6,11 +6,12 @@ const CopyrightRequest = sequelize.define('CopyrightRequest', {
   audioId: { type: DataTypes.INTEGER, allowNull: false },
   artistId: { type: DataTypes.INTEGER, allowNull: false },
   type: { type: DataTypes.ENUM('new', 'renewal'), allowNull: false },
-  status: { type: DataTypes.ENUM('pending', 'payment', 'processing', 'verified', 'rejected', 'completed'), defaultValue: 'pending' },
+  status: { type: DataTypes.ENUM('pending', 'payment', 'processing', 'preVerified', 'verified', 'rejected', 'completed'), defaultValue: 'pending' },
   paymentStatus: { type: DataTypes.ENUM('pending', 'paid'), defaultValue: 'pending' },
   processedBy: { type: DataTypes.JSON }, // officials who processed
   blockchainTx: { type: DataTypes.STRING },
   expiryDate: { type: DataTypes.DATE },
+  escalationNote: { type: DataTypes.STRING },
 }, {
   timestamps: true,
 });

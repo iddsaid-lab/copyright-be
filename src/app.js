@@ -57,8 +57,16 @@ app.use(errorHandler);
 
 // Start server after DB connection
 const PORT = process.env.PORT || 4000;
-sequelize.sync().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Backend server running on port ${PORT}`);
+if (process.env.NODE_ENV === 'development') {
+  sequelize.sync({ alter: true }).then(() => {
+    app.listen(PORT, () => {
+      console.log('Backend server running on port ' + PORT + ' (auto-sync enabled)');
+    });
   });
-});
+} else {
+  sequelize.sync().then(() => {
+    app.listen(PORT, () => {
+      console.log('Backend server running on port ' + PORT);
+    });
+  });
+}

@@ -62,13 +62,39 @@ export async function getAllCopyrightRequests(req, res, next) {
   } catch (err) { next(err); }
 }
 
+// Officer escalates a request to manager for final verification
+export async function escalateCopyrightRequest(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { escalationNote } = req.body;
+    const reqObj = await CopyrightRequest.findByPk(id);
+    if (!reqObj) return res.status(404).json({ error: 'Request not found' });
+    if (reqObj.status !== 'processing') return res.status(400).json({ error: 'Only processing requests can be escalated' });
+    reqObj.status = 'processed';
+    reqObj.escalationNote = escalationNote;
+    await reqObj.save();
+    res.json(reqObj);
+  } catch (err) { next(err); }
+}
+
 export async function processCopyrightRequest(req, res, next) {
   try {
     const { id } = req.params;
     const { status, paymentStatus, processedBy, blockchainTx, expiryDate } = req.body;
     const reqObj = await CopyrightRequest.findByPk(id);
     if (!reqObj) return res.status(404).json({ error: 'Request not found' });
-    reqObj.status = status || reqObj.status;
+    // Only allow status change to 'verified' if current status is 'processed' and user is a manager
+    if (status === 'verified') {
+      if (reqObj.status !== 'processed') {
+        return res.status(400).json({ error: 'Request must be processed before final verification' });
+      }
+      if (!req.user || req.user.role !== 'manager') {
+        return res.status(403).json({ error: 'Only managers can final-verify requests' });
+      }
+      reqObj.status = 'verified';
+    } else if (status) {
+      reqObj.status = status;
+    }
     reqObj.paymentStatus = paymentStatus || reqObj.paymentStatus;
     reqObj.processedBy = processedBy || reqObj.processedBy;
     reqObj.blockchainTx = blockchainTx || reqObj.blockchainTx;
