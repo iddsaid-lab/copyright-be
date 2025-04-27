@@ -55,6 +55,7 @@ export async function officerProcessRequest(req, res, next) {
     let processedBy = request.processedBy || [];
     if (isDuplicate) {
       request.status = 'rejected';
+      if (req.body.escalationNote) request.escalationNote = req.body.escalationNote;
       processedBy.push({ role: 'officer', userId: req.user.id, action: 'reject-duplicate', date: new Date() });
       request.processedBy = processedBy;
       await request.save();
@@ -64,11 +65,12 @@ export async function officerProcessRequest(req, res, next) {
     audio.hash = hash;
     await audio.save();
     // Escalate request for final verification
-    request.status = 'verified';
+    request.status = 'processed';
+    if (req.body.escalationNote) request.escalationNote = req.body.escalationNote;
     processedBy.push({ role: 'officer', userId: req.user.id, action: 'verify', date: new Date() });
     request.processedBy = processedBy;
     await request.save();
-    res.json({ message: 'Audio verified and ready for final blockchain registration', hash, request });
+    res.json({ message: 'Audio processed and escalated for manager review', hash, request });
   } catch (err) { next(err); }
 }
 

@@ -30,7 +30,7 @@ app.use(express.json());
 // Serve static files from /uploads/audios
 // Allow CORS for static audio files
 app.use('/uploads/audios', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:8080'); // Set to '*' to allow all, or restrict as needed
+  res.header('Access-Control-Allow-Origin', '*'); // Set to '*' to allow all, or restrict as needed
   res.header('Access-Control-Allow-Methods', 'GET,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   next();

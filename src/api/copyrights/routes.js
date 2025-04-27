@@ -69,7 +69,8 @@ export async function escalateCopyrightRequest(req, res, next) {
     const { escalationNote } = req.body;
     const reqObj = await CopyrightRequest.findByPk(id);
     if (!reqObj) return res.status(404).json({ error: 'Request not found' });
-    if (reqObj.status !== 'processing') return res.status(400).json({ error: 'Only processing requests can be escalated' });
+    if (!['pending', 'processing'].includes(reqObj.status)) return res.status(400).json({ error: 'Only pending or processing requests can be escalated' });
+    if (reqObj.paymentStatus !== 'paid') return res.status(400).json({ error: 'Only requests with paymentStatus paid can be escalated' });
     reqObj.status = 'processed';
     reqObj.escalationNote = escalationNote;
     await reqObj.save();
