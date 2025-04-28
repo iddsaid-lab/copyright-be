@@ -1,9 +1,11 @@
 import { Payment } from '../../models/index.js';
+import { generatePaymentNumber } from '../../utils/paymentUtils.js';
 
 export async function createPayment(req, res, next) {
   try {
-    const { copyrightRequestId, amount, paymentNumber } = req.body;
-    if (!copyrightRequestId || !amount || !paymentNumber) return res.status(400).json({ error: 'Missing required fields' });
+    const { copyrightRequestId, amount } = req.body;
+    if (!copyrightRequestId || !amount) return res.status(400).json({ error: 'Missing required fields' });
+    const paymentNumber = generatePaymentNumber();
     const payment = await Payment.create({ copyrightRequestId, amount, paymentNumber, status: 'pending' });
     res.status(201).json(payment);
   } catch (err) { next(err); }
