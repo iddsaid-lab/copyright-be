@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate, authorizeRoles } from '../../middleware/auth.js';
-import { submitCopyrightRequest, getMyCopyrightRequests, getAllCopyrightRequests, processCopyrightRequest, renewCopyrightRequest,escalateCopyrightRequest } from './routes.js';
+import { submitCopyrightRequest, getMyCopyrightRequests, getAllCopyrightRequests, processCopyrightRequest, renewCopyrightRequest,escalateCopyrightRequest, approveCopyrightPayment } from './routes.js';
 
 const router = express.Router();
 
@@ -20,5 +20,8 @@ router.post('/escalate/:id', authenticate, authorizeRoles('officer'), escalateCo
 
 // Renewal
 router.post('/renew/:id', authenticate, authorizeRoles('artist'), renewCopyrightRequest);
+
+// Approve copyright payment
+router.post('/approve-payment/:id', authenticate, authorizeRoles('cashier', 'admin'), approveCopyrightPayment);
 
 export default router;

@@ -33,6 +33,17 @@ export async function getInvoicesByArtist(req, res, next) {
   } catch (err) { next(err); }
 }
 
+export async function getInvoicesByArtistAndCopyright(req, res, next) {
+  try {
+    const { artistId, copyrightRequestId } = req.query;
+    if (!artistId || !copyrightRequestId) {
+      return res.status(400).json({ error: 'artistId and copyrightRequestId are required' });
+    }
+    const invoices = await Invoice.findAll({ where: { artistId, copyrightRequestId } });
+    res.json(invoices);
+  } catch (err) { next(err); }
+}
+
 export async function payInvoice(req, res, next) {
   try {
     const { id } = req.params;

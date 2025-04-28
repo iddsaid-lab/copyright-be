@@ -117,4 +117,14 @@ export async function renewCopyrightRequest(req, res, next) {
   } catch (err) { next(err); }
 }
 
-
+// Approve payment for a copyright request (set paymentStatus to 'paid')
+export async function approveCopyrightPayment(req, res, next) {
+  try {
+    const { id } = req.params;
+    const reqObj = await CopyrightRequest.findByPk(id);
+    if (!reqObj) return res.status(404).json({ error: 'Request not found' });
+    reqObj.paymentStatus = 'paid';
+    await reqObj.save();
+    res.json({ success: true, copyrightRequest: reqObj });
+  } catch (err) { next(err); }
+}
