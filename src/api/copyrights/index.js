@@ -1,6 +1,16 @@
 import express from 'express';
 import { authenticate, authorizeRoles } from '../../middleware/auth.js';
-import { submitCopyrightRequest, getMyCopyrightRequests, getAllCopyrightRequests, processCopyrightRequest, renewCopyrightRequest,escalateCopyrightRequest, approveCopyrightPayment } from './routes.js';
+import { 
+  submitCopyrightRequest, 
+  getMyCopyrightRequests, 
+  getAllCopyrightRequests, 
+  processCopyrightRequest, 
+  renewCopyrightRequest, 
+  escalateCopyrightRequest, 
+  approveCopyrightPayment,
+  getAllCopyrightsWithAudio,
+  getCopyrightDetailsById
+} from './routes.js';
 
 const router = express.Router();
 
@@ -13,7 +23,6 @@ router.get('/my', authenticate, getMyCopyrightRequests);
 router.get('/all', authenticate, authorizeRoles('manager', 'officer', 'cashier'), getAllCopyrightRequests);
 
 // New endpoint to get all copyright requests with their associated audio data
-import { getAllCopyrightsWithAudio } from './routes.js';
 router.get('/with-audio', authenticate, authorizeRoles('manager', 'officer', 'cashier'), getAllCopyrightsWithAudio);
 router.post('/process/:id', authenticate, authorizeRoles('manager', 'officer', 'cashier'), processCopyrightRequest);
 router.post('/escalate/:id', authenticate, authorizeRoles('officer'), escalateCopyrightRequest);
@@ -23,5 +32,8 @@ router.post('/renew/:id', authenticate, authorizeRoles('artist'), renewCopyright
 
 // Approve copyright payment
 router.post('/approve-payment/:id', authenticate, authorizeRoles('cashier', 'admin'), approveCopyrightPayment);
+
+// Endpoint to get copyright and its audio and artist details by copyrightId
+router.get('/details/:copyrightId', authenticate, authorizeRoles('manager', 'officer', 'cashier', 'artist'), getCopyrightDetailsById);
 
 export default router;

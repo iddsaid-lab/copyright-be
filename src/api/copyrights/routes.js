@@ -128,3 +128,24 @@ export async function approveCopyrightPayment(req, res, next) {
     res.json({ success: true, copyrightRequest: reqObj });
   } catch (err) { next(err); }
 }
+
+// Get copyright and its audio and artist details by copyrightId
+export async function getCopyrightDetailsById(req, res, next) {
+  try {
+    const { copyrightId } = req.params;
+    // Find copyright request
+    const copyright = await CopyrightRequest.findByPk(copyrightId);
+    if (!copyright) return res.status(404).json({ error: 'Copyright not found' });
+    // Find audio
+    const audio = await Audio.findByPk(copyright.audioId);
+    // Find artist user and artist profile
+    let artistUser = null;
+    let artistProfile = null;
+    if (copyright.artistId) {
+      const { User, Artist } = await import('../../models/index.js');
+      artistUser = await User.findByPk(copyright.artistId);
+      artistProfile = await Artist.findOne({ where: { userId: copyright.artistId } });
+    }
+    res.json({ copyright, audio, artist: artistUser, artistProfile });
+  } catch (err) { next(err); }
+}

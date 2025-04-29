@@ -65,3 +65,13 @@ export async function getAudioById(req, res, next) {
     res.json(audio);
   } catch (err) { next(err); }
 }
+
+// Update hash for a specific audio by audio id
+export async function updateAudioHashById(req, res, next) {
+  try {
+    const { id, hash } = req.body;
+    if (!id || !hash) return res.status(400).json({ error: 'id and hash are required' });
+    const [updatedCount] = await Audio.update({ hash }, { where: { id } });
+    res.json({ updated: updatedCount });
+  } catch (err) { next(err); }
+}

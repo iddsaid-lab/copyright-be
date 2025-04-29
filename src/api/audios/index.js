@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate, authorizeRoles } from '../../middleware/auth.js';
-import { uploadAudio, getMyAudios, getAudioById, getAllAudios } from './routes.js';
+import { uploadAudio, getMyAudios, getAudioById, getAllAudios, updateAudioHashById } from './routes.js';
 
 const router = express.Router();
 
@@ -17,5 +17,8 @@ router.get('/:id', authenticate, getAudioById);
 
 // Admin/officer/cashier: get all audios
 router.get('/all', authenticate, authorizeRoles('manager', 'officer', 'cashier'), getAllAudios);
+
+// Admin/officer: update hash for a specific audio by id
+router.post('/update-hash', authenticate, authorizeRoles('manager', 'officer'), updateAudioHashById);
 
 export default router;
